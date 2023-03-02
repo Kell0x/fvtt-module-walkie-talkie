@@ -70,4 +70,36 @@ Hooks.on("ready", () => {
     .catch((err) => {
       log.error("Error getting audio device:", err);
     });
+  
+  Hooks.on("preCreateToken", (scene, tokenData, options, userId) => {
+    if (!game.user.isGM && tokenData.actorData?.hasPlayerOwner) {
+      const localToken = canvas.tokens.controlled[0];
+      if (localToken && localToken._id !== tokenData._id && localToken.distanceTo(tokenData) <= game.settings.get(moduleName, "audioDistance")) {
+        this.initPeer(tokenData.actorData._id);
+      }
+    }
+  });
+
+  Hooks.on("preUpdateToken", (scene, tokenData, update, options, userId) => {
+    if (!game.user.isGM && tokenData.actorData?.hasPlayerOwner) {
+      const localToken = canvas.tokens.controlled[0];
+      const token = new Token(tokenData);
+      const distance = localToken.distanceTo(token);
+      const isConnected = this.peers.has(tokenData.actorData._id) && this.peers.get(tokenData.actorData._id).connected;
+      if (localToken && localToken._id !== tokenData._id && distance <= game.settings.get(moduleName, "audioDistance") && !isConnected) {
+        this.initPeer(tokenData.actorData._id);
+      } else if (localToken && localToken._id !== tokenData._id && distance > game.settings.get(moduleName, "audioDistance") && isConnected) {
+        this.closePeer(tokenData.actorData._id);
+      }
+    }
+  });
+
+  Hooks.on("deleteToken", (scene, tokenData, options, userId) => {
+    if (!game.user.isGM && tokenData.actorData?.hasPlayerOwner) {
+      const isConnected = this.peers.has(tokenData.actorData._id) && this.peers.get(tokenData.actorData._id).connected;
+      if (isConnected) {
+        this.closePeer(tokenData.actorData._id);
+      }
+    }
+  });
 });
