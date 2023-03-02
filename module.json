@@ -12,6 +12,9 @@
       "patreon": "bekit",
       "ko-fi": "bekit",
       "twitter": "@bekit"
+    },
+    {
+      "name": "Kell0x"
     }
   ],
   "version": "0.2.4",
@@ -21,12 +24,11 @@
   "esmodules": ["src/walkie-talkie.js"],
   "styles": ["styles/walkie-talkie.css"],
   "socket": true,
-  "url": "https://github.com/bekriebel/fvtt-module-walkie-talkie",
-  "manifest": "https://github.com/bekriebel/fvtt-module-walkie-talkie/releases/latest/download/module.json",
-  "download": "https://github.com/bekriebel/fvtt-module-walkie-talkie/releases/latest/download/fvtt-module-walkie-talkie.zip",
-  "readme": "https://github.com/bekriebel/fvtt-module-walkie-talkie/blob/main/README.md",
-  "changelog": "https://github.com/bekriebel/fvtt-module-walkie-talkie/blob/main/CHANGELOG.md",
-  "bugs": "https://github.com/bekriebel/fvtt-module-walkie-talkie/issues",
+  "url": "https://github.com/Kell0x/fvtt-module-walkie-talkie",
+  "manifest": "https://github.com/Kell0x/fvtt-module-walkie-talkie/mainule.json",
+  "readme": "https://github.com/Kell0x/fvtt-module-walkie-talkie/blob/main/README.md",
+  "changelog": "https://github.com/Kell0x/fvtt-module-walkie-talkie/blob/main/CHANGELOG.md",
+  "bugs": "https://github.com/Kell0x/fvtt-module-walkie-talkie/issues",
   "languages": [
     {
       "lang": "en",
