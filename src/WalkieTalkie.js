@@ -10,7 +10,56 @@ export default class WalkieTalkie {
     this.localStreams = new Map();
     this.talkieButtons = new Map();
     this.savedAvEnabledState = false;
-  }
+    
+    Hooks.once("init", () => {
+      // Set grid distance that is considered "within proximity"
+      game.settings.register(moduleName, "audioDistance", {
+          name: `${moduleName}.settings.audioDistance.name`,
+          hint: `${moduleName}.settings.audioDistance.hint`,
+          scope: "world",
+          config: true,
+          type: Number,
+          default: 30,
+          range: {
+              min: 5,
+              max: 200,
+              step: 5
+          }
+      });
+    });
+
+    Hooks.on("preCreateToken", (scene, tokenData, options, userId) => {
+      if (!game.user.isGM && tokenData.actorData?.hasPlayerOwner) {
+        const localToken = canvas.tokens.controlled[0];
+        if (localToken && localToken._id !== tokenData._id && localToken.distanceTo(tokenData) <= game.settings.get(moduleName, "audioDistance")) {
+          this.initPeer(tokenData.actorData._id);
+        }
+      }
+    });
+    
+    Hooks.on("preUpdateToken", (scene, tokenData, update, options, userId) => {
+      if (!game.user.isGM && tokenData.actorData?.hasPlayerOwner) {
+        const localToken = canvas.tokens.controlled[0];
+        const token = new Token(tokenData);
+        const distance = localToken.distanceTo(token);
+        const isConnected = this.peers.has(tokenData.actorData._id) && this.peers.get(tokenData.actorData._id).connected;
+        if (localToken && localToken._id !== tokenData._id && distance <= game.settings.get(moduleName, "audioDistance") && !isConnected) {
+          this.initPeer(tokenData.actorData._id);
+        } else if (localToken && localToken._id !== tokenData._id && distance > game.settings.get(moduleName, "audioDistance") && isConnected) {
+          this.closePeer(tokenData.actorData._id);
+        }
+      }
+    });
+    
+    Hooks.on("deleteToken", (scene, tokenData, options, userId) => {
+      if (!game.user.isGM && tokenData.actorData?.hasPlayerOwner) {
+        const isConnected = this.peers.has(tokenData.actorData._id) && this.peers.get(tokenData.actorData._id).connected;
+        if (isConnected) {
+          this.closePeer(tokenData.actorData._id);
+        }
+      }
+    });
+}
 
   // Module Code
   setupPeer(userId, isInitiator = false) {
@@ -66,7 +115,26 @@ export default class WalkieTalkie {
       }
     });
 
-    ui.players.render();
+    ui.players.render();if (!isInitiator && game.user.id < userId) {
+      this.initPeer(userId);
+    }
+  }
+
+  _onSocketMessage(data) {
+    switch (data.action) {
+      case "peer-signal": {
+        this.signal(data.userId, data.data);
+        break;
+      }
+      case "peer-close": {
+        this.closePeer(data.userId);
+        break;
+      }
+      case "peer-broadcasting": {
+        this._remoteBroadcasting(data.userId, data.broadcasting);
+        break;
+      }
+    }
   }
 
   signal(userId, data) {
