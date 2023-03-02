@@ -22,6 +22,7 @@
   "styles": ["styles/walkie-talkie.css"],
   "socket": true,
   "url": "https://github.com/Kell0x/fvtt-module-walkie-talkie",
+  "download": "https://github.com/Kell0x/fvtt-module-walkie-talkie/archive/refs/tags/release.zip",
   "manifest": "https://github.com/Kell0x/fvtt-module-walkie-talkie/main/module.json",
   "readme": "https://github.com/Kell0x/fvtt-module-walkie-talkie/blob/main/README.md",
   "changelog": "https://github.com/Kell0x/fvtt-module-walkie-talkie/blob/main/CHANGELOG.md",
